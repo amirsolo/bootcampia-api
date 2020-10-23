@@ -21,7 +21,7 @@
       1,
       {
         "ignoreSiblings": true,
-        "argsIgnorePattern": "val|res|next|^err"
+        "argsIgnorePattern": "val|res|next|err|promise"
       }
     ],
     "no-console": 0,
