@@ -1,7 +1,7 @@
 {
-  "name": "bootcamper_api",
+  "name": "bootcampia_api",
   "version": "1.0.0",
-  "description": "BootCamper Backend API",
+  "description": "Bootcampia_api Backend API",
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node server.js",
