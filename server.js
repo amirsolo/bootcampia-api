@@ -15,12 +15,18 @@ const app = express()
 // Route files
 const bootcamps = require('./routes/bootcamps')
 
+// JSON body parser middleware
+app.use(express.json())
+
 // Logging middleware (Only in Dev environment)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
 
 // Mount routes
+app.get('/', (req, res, next) => {
+  res.send('Server is running & API is working')
+})
 app.use('/api/v1/bootcamps', bootcamps)
 
 const PORT = process.env.PORT || 3004
