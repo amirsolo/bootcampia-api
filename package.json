@@ -1,11 +1,15 @@
 {
   "name": "bootcampia_api",
   "version": "1.0.0",
+  "engines": {
+    "node": "12.0.0"
+  },
   "description": "Bootcampia_api Backend API",
   "main": "server.js",
   "scripts": {
     "start": "NODE_ENV=production node server.js",
-    "dev:server": "nodemon server.js"
+    "dev:server": "nodemon server.js",
+    "prod:server": "NODE_ENV=production nodemon server.js"
   },
   "author": "Amir Solo",
   "license": "MIT",

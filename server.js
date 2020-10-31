@@ -3,6 +3,7 @@ const dotenv = require('dotenv')
 const morgan = require('morgan')
 require('colors')
 const connectDB = require('./config/db')
+const globalErrorHandler = require('./middleware/error')
 
 // Load env vars
 dotenv.config({ path: './config/config.env' })
@@ -29,6 +30,9 @@ app.get('/', (req, res, next) => {
 })
 app.use('/api/v1/bootcamps', bootcamps)
 
+// Error Handler middleware
+app.use(globalErrorHandler)
+
 const PORT = process.env.PORT || 3004
 const server = app.listen(
   PORT,
@@ -39,7 +43,17 @@ const server = app.listen(
 
 // Handle "Unhandled promise rejections"
 process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`.red.bold)
+  console.log(`${err.name}: ${err.message}`.red)
+  console.log('Unhandled Rejection! Sutting down...'.red)
+
+  // Close server and exit process (1: with failure)
+  server.close(() => process.exit(1))
+})
+
+// Handle "Uncaught Exceptions" errors
+process.on('uncaughtException', (err, promise) => {
+  console.log(`${err.name}: ${err.message}`.red)
+  console.log('ncaught Exceptions! Sutting down...'.red)
 
   // Close server and exit process (1: with failure)
   server.close(() => process.exit(1))
