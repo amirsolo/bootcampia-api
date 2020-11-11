@@ -7,8 +7,12 @@ const {
   getBootcamp,
   createBootcamp,
   updateBootcamp,
-  deleteBootcamp
+  deleteBootcamp,
+  getBootcampsInRadius
 } = require('../controllers/bootcamps')
+
+// Get bootcamps within the given distance
+router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius)
 
 // Get all bootcamps + Post bootcamp
 router.route('/').get(getBootcamps).post(createBootcamp)

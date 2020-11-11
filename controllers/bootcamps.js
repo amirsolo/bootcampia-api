@@ -1,5 +1,6 @@
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/Bootcamp')
+const geocoder = require('../utils/geocoder')
 const asyncHandler = require('../middleware/async')
 
 // @route     GET /api/v1/bootcamps
@@ -60,4 +61,31 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({ success: true, data: {} })
+})
+
+// @route     GET /api/v1/bootcamps/radius/:zipcode/:distance
+// @desc      Get bootcamps within a spicific distance
+exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
+  // Get zipcode and distance form params
+  const { zipcode, distance } = req.params
+
+  // Get zipcode coordinates (let, long)
+  const [loc] = await geocoder.geocode(zipcode)
+  const lat = loc.latitude
+  const lng = loc.longitude
+
+  // calculate circle radius measured in radians
+  // devide distance by earth raduis (6,371 km, 3,959 m)
+  // More Info: https://stackoverflow.com/questions/12180290/convert-kilometers-to-radians
+  const radius = distance / 3959
+
+  const bootcamps = await Bootcamp.find({
+    location: {
+      $geoWithin: { $centerSphere: [[lng, lat], radius] }
+    }
+  })
+
+  return res
+    .status(200)
+    .json({ success: true, count: bootcamps.length, data: bootcamps })
 })
