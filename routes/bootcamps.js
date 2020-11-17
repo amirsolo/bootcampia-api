@@ -11,7 +11,7 @@ const {
   getBootcampsInRadius
 } = require('../controllers/bootcamps')
 
-// Get bootcamps within the given distance
+// Get bootcamps within the given radius
 router.route('/radius/:zipcode/:distance').get(getBootcampsInRadius)
 
 // Get all bootcamps + Post bootcamp

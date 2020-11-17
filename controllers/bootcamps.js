@@ -6,11 +6,79 @@ const asyncHandler = require('../middleware/async')
 // @route     GET /api/v1/bootcamps
 // @desc      Get all bootcamps
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find()
+  // Copy req.query
+  const reqQuery = { ...req.query }
 
-  return res
-    .status(200)
-    .json({ success: true, count: bootcamps.length, data: bootcamps })
+  // Exclude fields
+  const removeFields = ['select', 'sort', 'page', 'limit']
+  removeFields.forEach((field) => delete reqQuery[field])
+
+  // Create query string
+  let queryStr = JSON.stringify(reqQuery)
+
+  // Create Operators ($gt, $gte, etc)
+  queryStr = queryStr.replace(/\b(lte|lt|gt|gte|in)\b/g, (match) => `$${match}`)
+
+  // Finding resource
+  const query = Bootcamp.find(JSON.parse(queryStr))
+
+  // Select fields
+  if (req.query.select) {
+    const fields = req.query.select.split(',').join(' ')
+    query.select(fields)
+  }
+
+  // Sort fields
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ')
+    query.sort(sortBy)
+  } else {
+    // Sort by createdAt date (descending)
+    query.sort('-createdAt')
+  }
+
+  // Pagination settings
+  const page = parseInt(req.query.page, 10) || 1
+  const limit = parseInt(req.query.limit, 10) || 4
+  const startIndex = (page - 1) * limit
+  const endIndex = page * limit
+  const total = await Bootcamp.countDocuments()
+
+  query.skip(startIndex).limit(limit)
+
+  // Executing query
+  const bootcamps = await query
+
+  // Pagination Result
+  let pagination = {}
+
+  // Define next page info
+  if (endIndex < total) {
+    pagination.next = {
+      page: page + 1,
+      limit
+    }
+  }
+
+  // Define previous page info
+  if (startIndex > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit
+    }
+  }
+
+  // if there is no result
+  if (bootcamps.length === 0) {
+    pagination = {}
+  }
+
+  return res.status(200).json({
+    success: true,
+    pagination,
+    count: bootcamps.length,
+    data: bootcamps
+  })
 })
 
 // @route     GET /api/v1/bootcamps/:id
