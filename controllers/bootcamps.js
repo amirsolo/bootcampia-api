@@ -20,7 +20,10 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   queryStr = queryStr.replace(/\b(lte|lt|gt|gte|in)\b/g, (match) => `$${match}`)
 
   // Finding resource
-  const query = Bootcamp.find(JSON.parse(queryStr))
+  const query = Bootcamp.find(JSON.parse(queryStr)).populate({
+    path: 'courses',
+    select: 'title desctiption'
+  })
 
   // Select fields
   if (req.query.select) {
@@ -84,7 +87,10 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/bootcamps/:id
 // @desc      Get single bootcamp with the given id
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findById(req.params.id)
+  const bootcamp = await Bootcamp.findById(req.params.id).populate({
+    path: 'courses',
+    select: 'title description'
+  })
 
   // If bootcamp doesn't exist in DB
   if (!bootcamp) {
@@ -101,7 +107,7 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.create(req.body)
 
-  return res.status(200).json({ success: true, data: bootcamp })
+  return res.status(201).json({ success: true, data: bootcamp })
 })
 
 // @route     PUT /api/v1/bootcamps/:id
@@ -112,8 +118,11 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
     runValidators: true
   })
 
+  // If bootcamp doesn't exist in DB
   if (!bootcamp) {
-    return res.status(400).json({ success: false })
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    )
   }
 
   return res.status(200).json({ success: true, data: bootcamp })
@@ -122,11 +131,17 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @route     DELETE /api/v1/bootcamps/:id
 // @desc      Delete Single bootcamp with the given id
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id)
+  const bootcamp = await Bootcamp.findById(req.params.id)
 
+  // If bootcamp doesn't exist in DB
   if (!bootcamp) {
-    return res.status(400).json({ success: false })
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    )
   }
+
+  // Delete bootcamp
+  await bootcamp.remove()
 
   return res.status(200).json({ success: true, data: {} })
 })

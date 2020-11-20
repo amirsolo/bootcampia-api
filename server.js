@@ -15,6 +15,7 @@ const app = express()
 
 // Route files
 const bootcamps = require('./routes/bootcamps')
+const courses = require('./routes/courses')
 
 // JSON body parser middleware
 app.use(express.json())
@@ -29,6 +30,7 @@ app.get('/', (req, res, next) => {
   res.send('Server is running & API is working')
 })
 app.use('/api/v1/bootcamps', bootcamps)
+app.use('/api/v1/courses', courses)
 
 // Error Handler middleware
 app.use(globalErrorHandler)
