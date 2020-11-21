@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose')
 
-const courseSchema = new Schema({
+const CourseSchema = new Schema({
   title: {
     type: String,
     trim: true,
@@ -38,4 +38,40 @@ const courseSchema = new Schema({
   }
 })
 
-module.exports = model('Course', courseSchema)
+// Get averageCost of bootcamp (Using Aggregation)
+CourseSchema.statics.getAverageCost = async function (bootcampId) {
+  const res = await this.aggregate([
+    { $match: { bootcamp: bootcampId } },
+    { $group: { _id: '$bootcamp', averageCost: { $avg: '$tuition' } } }
+  ])
+
+  try {
+    if (res[0]) {
+      const { averageCost } = res[0]
+
+      await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
+        averageCost: Math.ceil(averageCost / 10) * 10
+      })
+    } else {
+      await this.model('Bootcamp').findByIdAndUpdate(bootcampId, {
+        averageCost: undefined
+      })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// Call getAverageCost after save
+CourseSchema.post('save', async function (doc, next) {
+  await this.constructor.getAverageCost(doc.bootcamp)
+  return next()
+})
+
+// Call getAverageCost after remove
+CourseSchema.post('remove', async function (doc, next) {
+  await this.constructor.getAverageCost(doc.bootcamp)
+  return next()
+})
+
+module.exports = model('Course', CourseSchema)
