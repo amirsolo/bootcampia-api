@@ -1,6 +1,8 @@
 const express = require('express')
+const path = require('path')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
+const fileupload = require('express-fileupload')
 require('colors')
 const connectDB = require('./config/db')
 const globalErrorHandler = require('./middleware/error')
@@ -20,10 +22,16 @@ const courses = require('./routes/courses')
 // JSON body parser middleware
 app.use(express.json())
 
+// File upload
+app.use(fileupload())
+
 // Logging middleware (Only in Dev environment)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
+
+// Set static folder
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Mount routes
 app.get('/', (req, res, next) => {

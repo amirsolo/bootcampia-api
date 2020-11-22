@@ -1,3 +1,5 @@
+const path = require('path')
+const fs = require('fs')
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/Bootcamp')
 const geocoder = require('../utils/geocoder')
@@ -143,7 +145,9 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   // Delete bootcamp
   await bootcamp.remove()
 
-  return res.status(200).json({ success: true, data: {} })
+  return res
+    .status(200)
+    .json({ success: true, data: { message: 'Bootcamp Delted Successfully.' } })
 })
 
 // @route     GET /api/v1/bootcamps/radius/:zipcode/:distance
@@ -171,4 +175,103 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, count: bootcamps.length, data: bootcamps })
+})
+
+// @route     PUT /api/v1/bootcamps/:id/photo
+// @desc      Upload bootcamp photo
+exports.uploadBootcampPhoto = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id)
+
+  // If bootcamp doesn't exist in DB
+  if (!bootcamp) {
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    )
+  }
+
+  // Check if a file is uploaded
+  if (!req.files) {
+    return next(new AppError(`No file was uploaded.`, 400))
+  }
+  // Make sure the file is being uploaded by the kay "file"
+  if (!req.files.file) {
+    return next(new AppError(`No file was uploaded.`, 400))
+  }
+
+  const { file } = req.files
+
+  // Check if Its an image
+  if (!file.mimetype.startsWith('image')) {
+    return next(new AppError(`File must be an image`, 400))
+  }
+
+  // Check the size of the image
+  if (file.size > process.env.IMAGE_UPLOAD_MAX) {
+    const sizeInKB = `${Math.floor(process.env.IMAGE_UPLOAD_MAX / 1000)} KB`
+    return next(new AppError(`File cannot be more than ${sizeInKB}`, 400))
+  }
+
+  // Create custom filename
+  file.name = `bootcampPhoto_${bootcamp._id}${path.parse(file.name).ext}`
+
+  // Move(Save) file to image folder
+  const photoPath = `${process.env.IMAGE_UPLOAD_PATH}/${file.name}`
+  return file.mv(photoPath, async (err) => {
+    if (err) {
+      console.error('Problem with uploading bootcamp photo: ', err)
+      return next(
+        new AppError(`Something went wrong with uploading the photo`, 500)
+      )
+    }
+
+    // Update bootcamp photo filed in DB
+    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name })
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        file_name: file.name
+      }
+    })
+  })
+})
+
+// @route     DELETE /api/v1/bootcamps/:id/photo
+// @desc      Delete bootcamp photo
+exports.deleteBootcampPhoto = asyncHandler(async (req, res, next) => {
+  const bootcamp = await Bootcamp.findById(req.params.id)
+
+  // If bootcamp doesn't exist in DB
+  if (!bootcamp) {
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    )
+  }
+
+  // if there is no photo for the bootcamp
+  if (bootcamp.photo === 'no-photo.jpg') {
+    return next(new AppError(`No photo found for this bootcamp`, 404))
+  }
+
+  const photoPath = `${process.env.IMAGE_UPLOAD_PATH}/${bootcamp.photo}`
+  return fs.unlink(photoPath, async (err) => {
+    if (err) {
+      console.error('Problem with deleting bootcamp photo: ', err)
+      return next(
+        new AppError(`Something went wrong with deleting the photo`, 500)
+      )
+    }
+
+    // Update bootcamp in DB
+    await Bootcamp.findByIdAndUpdate(req.params.id, {
+      photo: 'no-photo.jpg'
+    })
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        message: 'Photo deleted successfully.'
+      }
+    })
+  })
 })
