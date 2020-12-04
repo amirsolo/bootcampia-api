@@ -1,7 +1,7 @@
 const express = require('express')
 
 const router = express.Router()
-const Bootcamp = require('../models/Bootcamp')
+const Bootcamp = require('../models/BootcampModel')
 const advancedResults = require('../middleware/advancedResults')
 // Bootcamp controllers
 const {
@@ -13,10 +13,10 @@ const {
   getBootcampsInRadius,
   uploadBootcampPhoto,
   deleteBootcampPhoto
-} = require('../controllers/bootcamps')
+} = require('../controllers/bootcampController')
 
 // Include other resource routes
-const courseRouter = require('./courses')
+const courseRouter = require('./courseRouter')
 
 // Re-route into other resources
 router.use('/:bootcampId/courses', courseRouter)

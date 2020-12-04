@@ -1,7 +1,7 @@
 const express = require('express')
 
 const router = express.Router({ mergeParams: true })
-const Course = require('../models/Course')
+const Course = require('../models/CourseModel')
 const advancedResults = require('../middleware/advancedResults')
 // Course controller methods
 const {
@@ -10,7 +10,7 @@ const {
   addCourse,
   updateCourse,
   deleteCourse
-} = require('../controllers/courses')
+} = require('../controllers/courseController')
 
 router
   .route('/')

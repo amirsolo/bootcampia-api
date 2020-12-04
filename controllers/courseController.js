@@ -1,7 +1,7 @@
 const AppError = require('../utils/appError')
 const asyncHandler = require('../middleware/async')
-const Course = require('../models/Course')
-const Bootcamp = require('../models/Bootcamp')
+const Course = require('../models/CourseModel')
+const Bootcamp = require('../models/BootcampModel')
 
 // @route     GET /api/v1/courses
 // @route     GET /api/v1/bootcamps/:bootcampId/courses
@@ -104,6 +104,7 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
   await course.remove()
 
   return res.status(200).json({
-    sucess: true
+    sucess: true,
+    data: { message: 'Bootcamp Delted Successfully.' }
   })
 })

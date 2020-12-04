@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const fileupload = require('express-fileupload')
 require('colors')
 const connectDB = require('./config/db')
-const globalErrorHandler = require('./middleware/error')
+const globalErrorHandler = require('./middleware/errorHandler')
 
 // Load env vars
 dotenv.config({ path: './config/config.env' })
@@ -16,8 +16,9 @@ connectDB()
 const app = express()
 
 // Route files
-const bootcamps = require('./routes/bootcamps')
-const courses = require('./routes/courses')
+const bootcampRouter = require('./routes/bootcampRouter')
+const courseRouter = require('./routes/courseRouter')
+const authRouter = require('./routes/authRouter')
 
 // JSON body parser middleware
 app.use(express.json())
@@ -37,8 +38,9 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.get('/', (req, res, next) => {
   res.send('Server is running & API is working')
 })
-app.use('/api/v1/bootcamps', bootcamps)
-app.use('/api/v1/courses', courses)
+app.use('/api/v1/bootcamps', bootcampRouter)
+app.use('/api/v1/courses', courseRouter)
+app.use('/api/v1/auth', authRouter)
 
 // Error Handler middleware
 app.use(globalErrorHandler)
