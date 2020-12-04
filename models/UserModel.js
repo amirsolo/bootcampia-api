@@ -27,6 +27,7 @@ const UserSchema = new Schema({
     type: String,
     required: [true, 'password is required'],
     minlength: 8,
+    maxlength: 64,
     select: false
   },
   resetPasswordToken: String,
@@ -64,6 +65,16 @@ UserSchema.methods.getJwtAccessToken = function () {
       return resolve(token)
     })
   })
+}
+
+// Match given password with the hashed password in DB
+UserSchema.methods.matchPassword = async function (pass) {
+  try {
+    return await bcrypt.compare(pass, this.password)
+  } catch (err) {
+    console.log('something went wrong with matching password: ', err)
+    return new AppError(`Internal Server Error!`, 500)
+  }
 }
 
 module.exports = model('User', UserSchema)

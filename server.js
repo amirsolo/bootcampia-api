@@ -6,6 +6,7 @@ const fileupload = require('express-fileupload')
 require('colors')
 const connectDB = require('./config/db')
 const globalErrorHandler = require('./middleware/errorHandler')
+const AppError = require('./utils/appError')
 
 // Load env vars
 dotenv.config({ path: './config/config.env' })
@@ -21,7 +22,13 @@ const courseRouter = require('./routes/courseRouter')
 const authRouter = require('./routes/authRouter')
 
 // JSON body parser middleware
-app.use(express.json())
+app.use((req, res, next) => {
+  express.json()(req, res, (err) => {
+    // Handle error in case of JSON parsing issue
+    if (err) return next(new AppError('Invalid JSON format', 400))
+    return next()
+  })
+})
 
 // File upload
 app.use(fileupload())
