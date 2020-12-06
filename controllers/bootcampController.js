@@ -3,7 +3,7 @@ const fs = require('fs')
 const AppError = require('../utils/appError')
 const Bootcamp = require('../models/BootcampModel')
 const geocoder = require('../utils/geocoder')
-const asyncHandler = require('../middleware/async')
+const asyncHandler = require('../middleware/asyncHandler')
 
 // @route     GET /api/v1/bootcamps
 // @desc      Get all bootcamps
@@ -70,9 +70,10 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   // Delete bootcamp
   await bootcamp.remove()
 
-  return res
-    .status(200)
-    .json({ success: true, data: { message: 'Bootcamp Delted Successfully.' } })
+  return res.status(200).json({
+    success: true,
+    data: { message: 'Bootcamp Deleted Successfully.' }
+  })
 })
 
 // @route     GET /api/v1/bootcamps/radius/:zipcode/:distance

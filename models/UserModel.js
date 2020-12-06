@@ -46,7 +46,7 @@ UserSchema.pre('save', async function (next) {
 })
 
 // Sign Jwt and return (Async)
-UserSchema.methods.getJwtAccessToken = function () {
+UserSchema.methods.signAccessToken = function () {
   return new Promise((resolve, reject) => {
     const payload = {
       userId: this._id

@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser')
 const fileupload = require('express-fileupload')
 require('colors')
 const connectDB = require('./config/db')
@@ -24,11 +25,22 @@ const authRouter = require('./routes/authRouter')
 // JSON body parser middleware
 app.use((req, res, next) => {
   express.json()(req, res, (err) => {
-    // Handle error in case of JSON parsing issue
-    if (err) return next(new AppError('Invalid JSON format', 400))
+    // Handle error in case of JSON parsing issues
+    if (
+      err &&
+      err instanceof SyntaxError &&
+      err.status === 400 &&
+      err.type === 'entity.parse.failed'
+    ) {
+      return next(new AppError(`Invalid JSON format: ${err.message}`, 400))
+    }
+
     return next()
   })
 })
+
+// Cookie Parser
+app.use(cookieParser())
 
 // File upload
 app.use(fileupload())

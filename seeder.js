@@ -7,8 +7,8 @@ require('colors')
 dotenv.config({ path: './config/config.env' })
 
 // Load models
-const Bootcamp = require('./models/Bootcamp')
-const Course = require('./models/Course')
+const Bootcamp = require('./models/BootcampModel')
+const Course = require('./models/CourseModel')
 
 // Connect to DB
 mongoose.connect(encodeURI(process.env.MONGO_URI), {
