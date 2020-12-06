@@ -24,6 +24,7 @@ const sendResponseToken = async (user, statusCode, res) => {
 
 // @route     POST /api/v1/auth/register
 // @desc      Register a user (Add user to DB & Send JWT token)
+// @access    Public
 exports.register = asyncHandler(async (req, res, next) => {
   const { name, email, password, role } = req.body
 
@@ -44,6 +45,7 @@ exports.register = asyncHandler(async (req, res, next) => {
 
 // @route     POST /api/v1/auth/login
 // @desc      Login a user (Send JWT token)
+// @access    Public
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body
 
@@ -56,4 +58,13 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!isCorrectPassword) return next(new AppError(`Invalid credentials.`, 401))
 
   return sendResponseToken(user, 200, res)
+})
+
+// @route     GET /api/v1/auth/me
+// @desc      Get currently logged in user's info
+// @access    Private
+exports.getMe = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id)
+
+  return res.status(200).json({ sucess: true, data: user })
 })
