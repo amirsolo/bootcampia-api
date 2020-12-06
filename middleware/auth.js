@@ -3,6 +3,7 @@ const AppError = require('../utils/appError')
 const User = require('../models/UserModel')
 const asyncHandler = require('./asyncHandler')
 
+// Protect routes
 exports.protect = asyncHandler(async (req, res, next) => {
   let token
 
@@ -37,3 +38,16 @@ exports.protect = asyncHandler(async (req, res, next) => {
     })
   )
 })
+
+// Role Authorization
+exports.authorize = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.user.role)) {
+    return next(
+      new AppError(
+        `User role [${req.user.role}] is not authorized to access this route`,
+        403
+      )
+    )
+  }
+  return next()
+}
