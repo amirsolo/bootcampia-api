@@ -32,8 +32,13 @@ exports.protect = asyncHandler(async (req, res, next) => {
       if (err)
         return next(new AppError('Not Authorized To Access This Route', 401))
 
+      const user = await User.findById(payload.userId)
+      if (!user)
+        return next(new AppError('Not Authorized To Access This Route', 401))
+
       // Attach the authorized user to req
-      req.user = await User.findById(payload.userId)
+      req.user = user
+
       return next()
     })
   )

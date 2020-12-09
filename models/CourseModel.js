@@ -27,14 +27,19 @@ const CourseSchema = new Schema({
     type: Boolean,
     default: false
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   bootcamp: {
     type: Schema.ObjectId,
     ref: 'Bootcamp',
     required: true
+  },
+  user: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
 })
 

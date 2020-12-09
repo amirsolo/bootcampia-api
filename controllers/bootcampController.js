@@ -35,6 +35,21 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @desc      Create a bootcamp
 // @access    Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  // Add user id to req.body
+  req.body.user = req.user.id
+
+  // If the user is not admin, They can only add one bootcamp
+  const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id })
+  if (publishedBootcamp && req.user.role !== 'admin') {
+    return next(
+      new AppError(
+        `User with the ID of ${req.user.id} has already published one bootcamp.`,
+        400
+      )
+    )
+  }
+
+  // Create bootcamp
   const bootcamp = await Bootcamp.create(req.body)
 
   return res.status(201).json({ success: true, data: bootcamp })
@@ -44,10 +59,7 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
 // @desc      Update single bootcamp with the given id
 // @access    Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true
-  })
+  let bootcamp = await Bootcamp.findById(req.params.id)
 
   // If bootcamp doesn't exist in DB
   if (!bootcamp) {
@@ -55,6 +67,16 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
       new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
     )
   }
+
+  // Makue sure user is bootcamp owner
+  if (req.user.id !== bootcamp.user.toString() && req.user.role !== 'admin') {
+    return next(new AppError(`Not authorized to commit this action.`, 403))
+  }
+
+  bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  })
 
   return res.status(200).json({ success: true, data: bootcamp })
 })
@@ -70,6 +92,11 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
     return next(
       new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
     )
+  }
+
+  // Makue sure user is bootcamp owner
+  if (req.user.id !== bootcamp.user.toString() && req.user.role !== 'admin') {
+    return next(new AppError(`Not authorized to commit this action.`, 403))
   }
 
   // Delete bootcamp
