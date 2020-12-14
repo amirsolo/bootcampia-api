@@ -9,7 +9,9 @@ const {
   login,
   getMe,
   forgotpassword,
-  resetpassword
+  resetpassword,
+  updateInfo,
+  updatePassword
 } = require('../controllers/authController')
 
 router.post('/register', validateInputs('userRegister'), register)
@@ -17,6 +19,10 @@ router.post('/register', validateInputs('userRegister'), register)
 router.post('/login', validateInputs('userLogin'), login)
 
 router.get('/me', protect, getMe)
+
+router.put('/updateinfo', protect, updateInfo)
+
+router.put('/updatepassword', protect, updatePassword)
 
 router.post('/forgotpassword', forgotpassword)
 
