@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const { Schema, model } = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -40,6 +41,8 @@ const UserSchema = new Schema({
 
 // Hash password before save
 UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next()
+
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
   return next()
@@ -75,6 +78,22 @@ UserSchema.methods.matchPassword = async function (pass) {
     console.log('something went wrong with matching password: ', err)
     return new AppError(`Internal Server Error!`, 500)
   }
+}
+
+// Generate reset password token
+UserSchema.methods.getResetPasswordToken = async function () {
+  const resetToken = crypto.randomBytes(20).toString('hex')
+
+  // Hash token and set it to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
+
+  // set token expiration date (10m)
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000
+
+  return resetToken
 }
 
 module.exports = model('User', UserSchema)

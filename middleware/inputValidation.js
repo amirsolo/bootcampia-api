@@ -8,7 +8,29 @@ const validateInput = (method) => {
   switch (method) {
     case 'userLogin':
       validationChain = [
-        body('email', 'email is not valid.').isEmail().trim(),
+        body('email', 'email is not valid.').trim().isEmail(),
+        body(
+          'password',
+          'password must be between 8 to 64 characters.'
+        ).isLength({ min: 8, max: 64 })
+      ]
+      break
+    case 'userRegister':
+      validationChain = [
+        body('name', 'name can not be more than 30 characters long')
+          .isLength({
+            max: 30
+          })
+          .trim(),
+        body('email', 'email is not valid.').trim().isEmail(),
+        body(
+          'password',
+          'password must be between 8 to 64 characters.'
+        ).isLength({ min: 8, max: 64 })
+      ]
+      break
+    case 'resetPassword':
+      validationChain = [
         body(
           'password',
           'password must be between 8 to 64 characters.'
