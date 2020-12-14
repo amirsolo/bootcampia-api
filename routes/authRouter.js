@@ -1,8 +1,7 @@
 const express = require('express')
 
 const router = express.Router()
-const validateInputs = require('../middleware/inputValidation')
-const { protect } = require('../middleware/auth')
+
 // Auth controller methods
 const {
   register,
@@ -13,6 +12,10 @@ const {
   updateInfo,
   updatePassword
 } = require('../controllers/authController')
+
+// Middlewares
+const validateInputs = require('../middleware/inputValidation')
+const { protect } = require('../middleware/auth')
 
 router.post('/register', validateInputs('userRegister'), register)
 

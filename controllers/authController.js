@@ -71,7 +71,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ sucess: true, data: user })
 })
 
-// @route     GET /api/v1/auth/updateinfo
+// @route     PUT /api/v1/auth/updateinfo
 // @desc      Update logged in user's info
 // @access    Private
 exports.updateInfo = asyncHandler(async (req, res, next) => {
@@ -87,7 +87,7 @@ exports.updateInfo = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ sucess: true, data: user })
 })
 
-// @route     GET /api/v1/auth/updatepassword
+// @route     PUT /api/v1/auth/updatepassword
 // @desc      Update logged in user's password
 // @access    Private
 exports.updatePassword = asyncHandler(async (req, res, next) => {

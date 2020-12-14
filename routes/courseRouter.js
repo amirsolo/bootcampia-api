@@ -1,9 +1,10 @@
 const express = require('express')
 
 const router = express.Router({ mergeParams: true })
+
+// Course model
 const Course = require('../models/CourseModel')
-const { protect, authorize } = require('../middleware/auth')
-const advancedResults = require('../middleware/advancedResults')
+
 // Course controller methods
 const {
   getCourses,
@@ -12,6 +13,10 @@ const {
   updateCourse,
   deleteCourse
 } = require('../controllers/courseController')
+
+// Middlewares
+const { protect, authorize } = require('../middleware/auth')
+const advancedResults = require('../middleware/advancedResults')
 
 router
   .route('/')

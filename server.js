@@ -21,6 +21,7 @@ const app = express()
 const bootcampRouter = require('./routes/bootcampRouter')
 const courseRouter = require('./routes/courseRouter')
 const authRouter = require('./routes/authRouter')
+const userRouter = require('./routes/userRouter')
 
 // JSON body parser middleware
 app.use((req, res, next) => {
@@ -60,6 +61,7 @@ app.get('/', (req, res, next) => {
 app.use('/api/v1/bootcamps', bootcampRouter)
 app.use('/api/v1/courses', courseRouter)
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/users', userRouter)
 
 // Error Handler middleware
 app.use(globalErrorHandler)
