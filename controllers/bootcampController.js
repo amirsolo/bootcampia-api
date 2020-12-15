@@ -35,9 +35,6 @@ exports.getBootcamp = asyncHandler(async (req, res, next) => {
 // @desc      Create a bootcamp
 // @access    Private
 exports.createBootcamp = asyncHandler(async (req, res, next) => {
-  // Add user id to req.body
-  req.body.user = req.user.id
-
   // If the user is not admin, They can only add one bootcamp
   const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id })
   if (publishedBootcamp && req.user.role !== 'admin') {
@@ -49,8 +46,24 @@ exports.createBootcamp = asyncHandler(async (req, res, next) => {
     )
   }
 
+  // Set bootcamp fields
+  const bootcampFields = {
+    name: req.body.name,
+    description: req.body.description,
+    website: req.body.website,
+    phone: req.body.phone || null,
+    email: req.body.email,
+    address: req.body.address,
+    careers: req.body.careers,
+    housing: req.body.housing || false,
+    jobAssistance: req.body.jobAssistance || false,
+    jobGuarantee: req.body.jobGuarantee || false,
+    acceptGi: req.body.acceptGi || false,
+    user: req.user.id
+  }
+
   // Create bootcamp
-  const bootcamp = await Bootcamp.create(req.body)
+  const bootcamp = await Bootcamp.create(bootcampFields)
 
   return res.status(201).json({ success: true, data: bootcamp })
 })

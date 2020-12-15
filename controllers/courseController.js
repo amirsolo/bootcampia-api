@@ -48,9 +48,6 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @desc      Add a course
 // @access    Private
 exports.addCourse = asyncHandler(async (req, res, next) => {
-  req.body.bootcamp = req.params.bootcampId
-  req.body.user = req.user.id
-
   const bootcamp = await Bootcamp.findById(req.params.bootcampId)
 
   // If bootcamp doesn't exist
@@ -68,7 +65,20 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
     return next(new AppError(`Not authorized to commit this action.`, 403))
   }
 
-  const course = await Course.create(req.body)
+  // Set fields
+  const fields = {
+    title: req.body.title,
+    description: req.body.description,
+    weeks: req.body.weeks,
+    tuition: req.body.tuition,
+    minimumSkill: req.body.minimumSkill,
+    scholrashipAvailable: req.body.scholrashipAvailable || false,
+    bootcamp: req.params.bootcampId,
+    user: req.user.id
+  }
+
+  // Create course
+  const course = await Course.create(fields)
 
   return res.status(201).json({
     sucess: true,

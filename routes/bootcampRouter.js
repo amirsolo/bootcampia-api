@@ -21,7 +21,7 @@ const {
 const { protect, authorize } = require('../middleware/auth')
 const advancedResults = require('../middleware/advancedResults')
 
-// Include other resource routes
+// other resource routes
 const courseRouter = require('./courseRouter')
 
 // Re-route into other resources
