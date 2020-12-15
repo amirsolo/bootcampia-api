@@ -22,6 +22,7 @@ const bootcampRouter = require('./routes/bootcampRouter')
 const courseRouter = require('./routes/courseRouter')
 const authRouter = require('./routes/authRouter')
 const userRouter = require('./routes/userRouter')
+const reviewRouter = require('./routes/reviewRouter')
 
 // JSON body parser middleware
 app.use((req, res, next) => {
@@ -62,6 +63,7 @@ app.use('/api/v1/bootcamps', bootcampRouter)
 app.use('/api/v1/courses', courseRouter)
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/users', userRouter)
+app.use('/api/v1/reviews', reviewRouter)
 
 // Error Handler middleware
 app.use(globalErrorHandler)

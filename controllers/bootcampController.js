@@ -86,7 +86,22 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
     return next(new AppError(`Not authorized to commit this action.`, 403))
   }
 
-  bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+  // Fields to update
+  const fieldsToUpdate = {
+    name: req.body.name || bootcamp.name,
+    description: req.body.description || bootcamp.description,
+    website: req.body.website || bootcamp.website,
+    phone: req.body.phone || null,
+    email: req.body.email || bootcamp.email,
+    address: req.body.address || bootcamp.address,
+    careers: req.body.careers || bootcamp.careers,
+    housing: req.body.housing || false,
+    jobAssistance: req.body.jobAssistance || false,
+    jobGuarantee: req.body.jobGuarantee || false,
+    acceptGi: req.body.acceptGi || false
+  }
+
+  bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
     runValidators: true
   })

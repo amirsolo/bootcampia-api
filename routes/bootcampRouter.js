@@ -23,9 +23,11 @@ const advancedResults = require('../middleware/advancedResults')
 
 // other resource routes
 const courseRouter = require('./courseRouter')
+const reviewRouter = require('./reviewRouter')
 
 // Re-route into other resources
 router.use('/:bootcampId/courses', courseRouter)
+router.use('/:bootcampId/reviews', reviewRouter)
 
 // Upload & Delete bootcamp photo
 router

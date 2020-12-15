@@ -69,8 +69,8 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
   const fields = {
     title: req.body.title,
     description: req.body.description,
-    weeks: req.body.weeks,
-    tuition: req.body.tuition,
+    weeks: Math.round(req.body.weeks),
+    tuition: Math.round(req.body.tuition),
     minimumSkill: req.body.minimumSkill,
     scholrashipAvailable: req.body.scholrashipAvailable || false,
     bootcamp: req.params.bootcampId,
@@ -99,12 +99,22 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
     )
   }
 
-  // Makue sure user is bootcamp owner
+  // Makue sure user is the course owner (admin is allowed)
   if (req.user.id !== course.user.toString() && req.user.role !== 'admin') {
-    return next(new AppError(`Not authorized to commit this action.`, 403))
+    return next(new AppError(`Not authorized to commit this action.`, 401))
   }
 
-  course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+  // Fields to update
+  const fieldsToUpdate = {
+    title: req.body.title || course.title,
+    description: req.body.description || course.description,
+    weeks: Math.round(req.body.weeks) || course.weeks,
+    tuition: Math.round(req.body.tuition) || course.tuition,
+    minimumSkill: req.body.minimumSkill || course.minimumSkill,
+    scholrashipAvailable: req.body.scholrashipAvailable || false
+  }
+
+  course = await Course.findByIdAndUpdate(req.params.id, fieldsToUpdate, {
     new: true,
     runValidators: true
   })
@@ -125,6 +135,11 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     return next(
       new AppError(`Course not found with id of ${req.params.id}`, 404)
     )
+  }
+
+  // Makue sure user is the course owner (admin is allowed)
+  if (req.user.id !== course.user.toString() && req.user.role !== 'admin') {
+    return next(new AppError(`Not authorized to commit this action.`, 401))
   }
 
   await course.remove()
