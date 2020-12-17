@@ -3,7 +3,13 @@ const path = require('path')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
+const cors = require('cors')
 const fileupload = require('express-fileupload')
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+const helment = require('helmet')
+const hpp = require('hpp')
+const rateLimit = require('express-rate-limit')
 require('colors')
 const connectDB = require('./config/db')
 const globalErrorHandler = require('./middleware/errorHandler')
@@ -23,6 +29,9 @@ const courseRouter = require('./routes/courseRouter')
 const authRouter = require('./routes/authRouter')
 const userRouter = require('./routes/userRouter')
 const reviewRouter = require('./routes/reviewRouter')
+
+// Enable CORS
+app.use(cors({ credentials: true }))
 
 // JSON body parser middleware
 app.use((req, res, next) => {
@@ -46,6 +55,30 @@ app.use(cookieParser())
 
 // File upload
 app.use(fileupload())
+
+// Sanatize Data (Against NoSQL injection)
+app.use(mongoSanitize())
+
+// Sanitize Data (Agains XSS attack)
+app.use(xss())
+
+// Set extra security headers
+app.use(helment())
+
+// Protection against HTTP Parameter Pollution attacks
+app.use(hpp())
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  max: 200,
+  message: {
+    sucess: false,
+    data: { msg: 'Too many requests, please try again later.' }
+  }
+})
+// apply to all requests
+app.use(limiter)
 
 // Logging middleware (Only in Dev environment)
 if (process.env.NODE_ENV === 'development') {
