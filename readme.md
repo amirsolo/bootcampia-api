@@ -1,6 +1,8 @@
 # Bootcampia API
 
-> Backend API for Bootcampia web application, which is a bootcamp directory app
+### Backend API for Bootcampia web app, which is a bootcamp management application
+
+### Built with Node.JS, Express.JS and MongoDB
 
 ## Features
 
@@ -73,7 +75,7 @@ git push YOUR_REPO_URL BRANCH_NAME
 
 ---
 
-Extensive documentation with examples [here](https://documenter.getpostman.com/view/8923145/SVtVVTzd?version=latest)
+Documentation with examples [here](https://documenter.getpostman.com/view/11396409/TVssjU7V)
 
 - Version: 1.0.0
 - License: MIT
